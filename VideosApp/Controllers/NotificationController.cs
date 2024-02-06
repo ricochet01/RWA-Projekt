@@ -43,5 +43,22 @@ namespace VideosApp.Controllers
 
             return Ok(notification);
         }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateNotification([FromBody] Notification notification)
+        {
+            if (notification == null || !ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!notificationRepository.CreateNotification(notification))
+            {
+                ModelState.AddModelError("", "Something went wrong with creating the notification.");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
     }
 }

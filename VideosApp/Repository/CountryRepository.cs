@@ -23,6 +23,13 @@ namespace VideosApp.Repository
             return Save();
         }
 
+        public bool UpdateCountry(Country country)
+        {
+            dataContext.Update(country);
+
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = dataContext.SaveChanges();

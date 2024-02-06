@@ -8,5 +8,8 @@ namespace VideosApp.Interface
         Notification GetNotification(int id);
         Notification GetNotification(string subject);
         bool NotificationExists(int id);
+
+        bool CreateNotification(Notification notification);
+        bool Save();
     }
 }

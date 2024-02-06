@@ -37,6 +37,17 @@ namespace VideosApp.Repository
             return Save();
         }
 
+        public bool UpdateUser(int countryId, User user)
+        {
+            var country = dataContext.Countries.FirstOrDefault(c => c.Id == countryId);
+            user.CountryOfResidence = country;
+            user.CountryOfResidenceId = countryId;
+
+            dataContext.Update(user);
+
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = dataContext.SaveChanges();

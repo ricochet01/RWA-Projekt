@@ -94,5 +94,29 @@ namespace VideosApp.Controllers
 
             return Ok("Successfully created");
         }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateUser(int id, [FromQuery] int countryId, [FromBody] UserDto updatedUser)
+        {
+            if (updatedUser == null) return BadRequest(ModelState);
+            if (id != updatedUser.Id) return BadRequest(ModelState);
+
+            if (!userRepository.UserExists(id)) return NotFound();
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var userMap = mapper.Map<User>(updatedUser);
+
+            if (!userRepository.UpdateUser(countryId, userMap))
+            {
+                ModelState.AddModelError("", "Something went wrong with updating the user");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }

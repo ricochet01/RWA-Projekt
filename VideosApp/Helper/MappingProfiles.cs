@@ -19,12 +19,16 @@ namespace VideosApp.Helper
             CreateMap<UserDto, User>();
 
             CreateMap<Genre, GenreDto>();
+            CreateMap<GenreDto, Genre>();
 
             CreateMap<Image, ImageDto>();
+            CreateMap<ImageDto, Image>();
 
             CreateMap<Tag, TagDto>();
+            CreateMap<TagDto, Tag>();
 
             CreateMap<Video, VideoDto>();
+            CreateMap<VideoDto, Video>();
         }
     }
 }

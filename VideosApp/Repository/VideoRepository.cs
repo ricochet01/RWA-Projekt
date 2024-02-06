@@ -24,5 +24,73 @@ namespace VideosApp.Repository
 
         public bool VideoExists(int id)
             => context.Videos.Any(v => v.Id == id);
+
+        public ICollection<Tag> GetVideoTags(int id)
+            => context.VideoTags.Where(vt => vt.VideoId == id).Select(vt => vt.Tag).ToList();
+
+        public bool CreateVideo(int genreId, int imageId, int[] tagIds, Video video)
+        {
+            var imageEntity = context.Images.FirstOrDefault(i => i.Id == imageId);
+            var genreEntity = context.Genres.FirstOrDefault(g => g.Id == genreId);
+
+            video.Image = imageEntity;
+            video.Genre = genreEntity;
+
+            var tags = context.Tags.Where(t => tagIds.Contains(t.Id));
+
+            ICollection<VideoTag> tagsList = new List<VideoTag>();
+            foreach (var tag in tags)
+            {
+                var videoTag = new VideoTag()
+                {
+                    Video = video,
+                    Tag = tag
+                };
+
+                tagsList.Add(videoTag);
+            }
+
+            video.VideoTags = tagsList;
+
+            context.Add(video);
+
+            return Save();
+        }
+
+        public bool UpdateVideo(int genreId, int imageId, int[] tagIds, Video video)
+        {
+            var imageEntity = context.Images.FirstOrDefault(i => i.Id == imageId);
+            var genreEntity = context.Genres.FirstOrDefault(g => g.Id == genreId);
+
+            video.Image = imageEntity;
+            video.Genre = genreEntity;
+
+            var tags = context.Tags.Where(t => tagIds.Contains(t.Id));
+
+            ICollection<VideoTag> tagsList = new List<VideoTag>();
+            foreach (var tag in tags)
+            {
+                var videoTag = new VideoTag()
+                {
+                    Video = video,
+                    Tag = tag
+                };
+
+                tagsList.Add(videoTag);
+            }
+
+            video.VideoTags = tagsList;
+
+            context.Update(video);
+
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = context.SaveChanges();
+
+            return saved > 0;
+        }
     }
 }

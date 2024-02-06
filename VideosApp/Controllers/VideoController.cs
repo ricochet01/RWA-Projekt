@@ -48,5 +48,83 @@ namespace VideosApp.Controllers
 
             return Ok(video);
         }
+
+        [HttpGet("Tag/{id}")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Tag>))]
+        [ProducesResponseType(400)]
+        public IActionResult GetTagsFromVideo(int id)
+        {
+            if (!videoRepository.VideoExists(id))
+            {
+                return NotFound();
+            }
+
+            var tags = mapper.Map<List<TagDto>>(videoRepository.GetVideoTags(id));
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            return Ok(tags);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateVideo([FromQuery] int genreId, [FromQuery] int imageId,
+            [FromQuery] string tagIds, [FromBody] VideoDto videoToCreate)
+        {
+            if (videoToCreate == null) return BadRequest(ModelState);
+
+            var video = videoRepository
+                .GetVideos()
+                .FirstOrDefault(c =>
+                    c.Name.Trim().ToUpper() == videoToCreate.Name.Trim().ToUpper() 
+                 || c.StreamingUrl.Trim().ToUpper() == videoToCreate.StreamingUrl.Trim().ToUpper());
+              
+
+            if (video != null)
+            {
+                ModelState.AddModelError("", "Video already exists!");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var videoMap = mapper.Map<Video>(videoToCreate);
+            int[] ids = tagIds.Split(',').Select(int.Parse).ToArray();
+
+            if (!videoRepository.CreateVideo(genreId, imageId, ids, videoMap))
+            {
+                ModelState.AddModelError("", "Something went wrong with creating the video.");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateVideo(int id, [FromQuery] int genreId, [FromQuery] int imageId,
+            [FromQuery] string tagIds, [FromBody] VideoDto updatedVideo)
+        {
+            if (updatedVideo == null) return BadRequest(ModelState);
+            if (id != updatedVideo.Id) return BadRequest(ModelState);
+
+            if (!videoRepository.VideoExists(id)) return NotFound();
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var tagMap = mapper.Map<Video>(updatedVideo);
+            int[] ids = tagIds.Split(',').Select(int.Parse).ToArray();
+
+            if (!videoRepository.UpdateVideo(genreId, imageId, ids, tagMap))
+            {
+                ModelState.AddModelError("", "Something went wrong with updating the tag");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }

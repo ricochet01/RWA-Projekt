@@ -24,9 +24,29 @@ namespace VideosApp.Repository
 
         public ICollection<Video> GetVideosByTag(int tagId)
             => context.VideoTags.Where(vt => vt.TagId == tagId).Select(vt => vt.Video).ToList();
-        
 
         public bool TagExists(int id)
             => context.Tags.Any(t => t.Id == id);
+
+        public bool CreateTag(Tag tag)
+        {
+            context.Add(tag);
+
+            return Save();
+        }
+
+        public bool UpdateTag(Tag tag)
+        {
+            context.Update(tag);
+
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = context.SaveChanges();
+
+            return saved > 0;
+        }
     }
 }

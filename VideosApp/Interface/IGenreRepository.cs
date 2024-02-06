@@ -8,6 +8,11 @@ namespace VideosApp.Interface
         Genre GetGenre(int id);
         Genre GetGenre(string name);
         Genre GetVideoGenre(int videoId);
+        ICollection<Video> GetVideosByGenre(int id);
         bool GenreExists(int id);
+
+        bool CreateGenre(Genre genre);
+        bool UpdateGenre(Genre genre);
+        bool Save();
     }
 }

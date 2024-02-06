@@ -7,7 +7,11 @@ namespace VideosApp.Interface
         ICollection<Tag> GetTags();
         Tag GetTag(int id);
         Tag GetTag(string name);
-        ICollection<Video> GetVideosByTag(int tagId);
+        ICollection<Video> GetVideosByTag(int id);
         bool TagExists(int id);
+
+        bool CreateTag(Tag tag);
+        bool UpdateTag(Tag tag);
+        bool Save();
     }
 }

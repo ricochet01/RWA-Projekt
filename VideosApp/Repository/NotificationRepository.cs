@@ -1,4 +1,5 @@
-﻿using VideosApp.Data;
+﻿using System.Diagnostics.Metrics;
+using VideosApp.Data;
 using VideosApp.Interface;
 using VideosApp.Model;
 
@@ -24,5 +25,19 @@ namespace VideosApp.Repository
 
         public bool NotificationExists(int id)
             => context.Notifications.Any(n => n.Id == id);
+
+        public bool CreateNotification(Notification notification)
+        {
+            context.Add(notification);
+
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = context.SaveChanges();
+
+            return saved > 0;
+        }
     }
 }
