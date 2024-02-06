@@ -118,5 +118,26 @@ namespace VideosApp.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteTag(int id)
+        {
+            if (!tagRepository.TagExists(id)) return NotFound();
+
+            var tagToDelete = tagRepository.GetTag(id);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!tagRepository.DeleteTag(tagToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong with deleting the tag");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }

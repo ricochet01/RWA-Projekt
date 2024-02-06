@@ -12,6 +12,7 @@ namespace VideosApp.Interface
 
         bool CreateTag(Tag tag);
         bool UpdateTag(Tag tag);
+        bool DeleteTag(Tag tag);
         bool Save();
     }
 }

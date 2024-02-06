@@ -12,6 +12,7 @@ namespace VideosApp.Interface
 
         bool CreateVideo(int genreId, int imageId, int[] tagIds, Video video);
         bool UpdateVideo(int genreId, int imageId, int[] tagIds, Video video);
+        bool DeleteVideo(Video video);
         bool Save();
     }
 }

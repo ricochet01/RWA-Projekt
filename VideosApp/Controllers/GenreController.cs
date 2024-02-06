@@ -112,7 +112,28 @@ namespace VideosApp.Controllers
 
             if (!genreRepository.UpdateGenre(genreMap))
             {
-                ModelState.AddModelError("", "Something went wrong with updating the tag");
+                ModelState.AddModelError("", "Something went wrong with updating the genre");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteGenre(int id)
+        {
+            if (!genreRepository.GenreExists(id)) return NotFound();
+
+            var genreToDelete = genreRepository.GetGenre(id);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!genreRepository.DeleteGenre(genreToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong with deleting the genre");
                 return StatusCode(500, ModelState);
             }
 

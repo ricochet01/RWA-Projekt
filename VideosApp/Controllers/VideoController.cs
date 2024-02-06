@@ -120,7 +120,28 @@ namespace VideosApp.Controllers
 
             if (!videoRepository.UpdateVideo(genreId, imageId, ids, tagMap))
             {
-                ModelState.AddModelError("", "Something went wrong with updating the tag");
+                ModelState.AddModelError("", "Something went wrong with updating the video");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteVideo(int id)
+        {
+            if (!videoRepository.VideoExists(id)) return NotFound();
+
+            var videoToDelete = videoRepository.GetVideo(id);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!videoRepository.DeleteVideo(videoToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong with deleting the video");
                 return StatusCode(500, ModelState);
             }
 

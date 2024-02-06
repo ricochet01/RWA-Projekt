@@ -14,17 +14,17 @@ namespace VideosApp.Repository
         }
 
         public ICollection<User> GetUsers()
-            => dataContext.Users.OrderBy(u => u.Id).ToList();
+            => dataContext.Users.OrderBy(u => u.Id).Where(u => u.DeletedAt == null).ToList();
         
 
         public User GetUser(int id)
-            => dataContext.Users.FirstOrDefault(u => u.Id == id);
+            => dataContext.Users.FirstOrDefault(u => u.Id == id && u.DeletedAt == null);
 
         public User GetUser(string username)
-            => dataContext.Users.FirstOrDefault(u => u.Username == username);
+            => dataContext.Users.FirstOrDefault(u => u.Username == username && u.DeletedAt == null);
 
         public bool UserExists(int id)
-            => dataContext.Users.Any(u => u.Id == id);
+            => dataContext.Users.Any(u => u.Id == id && u.DeletedAt == null);
 
         public bool CreateUser(int countryId, User user)
         {
@@ -43,6 +43,15 @@ namespace VideosApp.Repository
             user.CountryOfResidence = country;
             user.CountryOfResidenceId = countryId;
 
+            dataContext.Update(user);
+
+            return Save();
+        }
+
+        public bool DeleteUser(User user)
+        {
+            user.DeletedAt = DateTime.Now;
+            // "Soft delete" of a user
             dataContext.Update(user);
 
             return Save();

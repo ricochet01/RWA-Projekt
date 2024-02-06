@@ -45,6 +45,31 @@ namespace VideosApp.Repository
             return Save();
         }
 
+        public bool DeleteGenre(Genre genre)
+        {
+            // Obtain all videos of that genre
+            var videos = context.Videos.Where(v => v.GenreId == genre.Id).ToList();
+
+            // Then, we remove all VideoTag entries
+            var videoTags = context.VideoTags.Where(vt => videos.Contains(vt.Video)).ToList();
+
+            videoTags.ForEach(vt =>
+            {
+                context.Remove(vt);
+            });
+
+            // Next, we have to delete all videos with the genre
+            videos.ForEach(v =>
+            {
+                context.Remove(v);
+            });
+
+            // Finally, we can remove the genre
+            context.Remove(genre);
+
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = context.SaveChanges();

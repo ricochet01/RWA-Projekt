@@ -42,6 +42,19 @@ namespace VideosApp.Repository
             return Save();
         }
 
+        public bool DeleteTag(Tag tag)
+        {
+            var videoTags = context.VideoTags.Where(vt => vt.TagId == tag.Id).ToList();
+            videoTags.ForEach(vt =>
+            {
+                context.Remove(vt);
+            });
+
+            context.Remove(tag);
+
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = context.SaveChanges();

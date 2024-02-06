@@ -86,6 +86,20 @@ namespace VideosApp.Repository
             return Save();
         }
 
+        public bool DeleteVideo(Video video)
+        {
+            // Remove all VideoTag references
+            var videoTags = context.VideoTags.Where(vt => vt.VideoId == video.Id).ToList();
+            videoTags.ForEach(vt =>
+            {
+                context.Remove(vt);
+            });
+
+            context.Remove(video);
+
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = context.SaveChanges();

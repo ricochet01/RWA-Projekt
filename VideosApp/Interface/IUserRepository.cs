@@ -11,6 +11,7 @@ namespace VideosApp.Interface
 
         bool CreateUser(int countryId, User user);
         bool UpdateUser(int countryId, User user);
+        bool DeleteUser(User user);
         bool Save();
     }
 }

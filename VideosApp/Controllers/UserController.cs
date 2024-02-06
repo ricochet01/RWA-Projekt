@@ -19,16 +19,11 @@ namespace VideosApp.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository userRepository;
-        private readonly ICountryRepository countryRepository;
         private readonly IMapper mapper;
 
-        public UserController(
-            IUserRepository userRepository,
-            ICountryRepository countryRepository,
-            IMapper mapper)
+        public UserController(IUserRepository userRepository, IMapper mapper)
         {
             this.userRepository = userRepository;
-            this.countryRepository = countryRepository;
             this.mapper = mapper;
         }
 
@@ -113,6 +108,27 @@ namespace VideosApp.Controllers
             if (!userRepository.UpdateUser(countryId, userMap))
             {
                 ModelState.AddModelError("", "Something went wrong with updating the user");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteUser(int id)
+        {
+            if (!userRepository.UserExists(id)) return NotFound();
+
+            var userToDelete = userRepository.GetUser(id);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!userRepository.DeleteUser(userToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong with deleting the user");
                 return StatusCode(500, ModelState);
             }
 

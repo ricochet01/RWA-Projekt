@@ -13,6 +13,7 @@ namespace VideosApp.Interface
 
         bool CreateGenre(Genre genre);
         bool UpdateGenre(Genre genre);
+        bool DeleteGenre(Genre genre);
         bool Save();
     }
 }

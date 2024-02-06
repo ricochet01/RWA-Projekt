@@ -114,5 +114,26 @@ namespace VideosApp.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteCountry(int id)
+        {
+            if (!countryRepository.CountryExists(id)) return NotFound();
+
+            var countryToDelete = countryRepository.GetCountry(id);
+
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!countryRepository.DeleteCountry(countryToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong with deleting the country");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }

@@ -30,6 +30,23 @@ namespace VideosApp.Repository
             return Save();
         }
 
+        public bool DeleteCountry(Country country)
+        {
+            // We have to remove all users from that country before we remove the country
+            var users = dataContext.Users.Where(u => u.CountryOfResidenceId == country.Id).ToList();
+            users.ForEach(u =>
+            {
+                dataContext.Remove(u);
+                // Instead of this, we're going to "soft delete" the users
+
+                // u.DeletedAt = DateTime.Now;
+            });
+
+            dataContext.Remove(country);
+
+            return Save();
+        }
+
         public bool Save()
         {
             var saved = dataContext.SaveChanges();
