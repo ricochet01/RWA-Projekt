@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideosApp", "VideosApp\VideosApp.csproj", "{8F0C4EDB-F07F-4667-BD08-6C278CC7FA13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VideosApp", "VideosApp\VideosApp.csproj", "{8F0C4EDB-F07F-4667-BD08-6C278CC7FA13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideosApp-Admin", "VideosApp-Admin\VideosApp-Admin.csproj", "{F2C43EE3-77DC-4B13-AE19-9CF0EC402562}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{8F0C4EDB-F07F-4667-BD08-6C278CC7FA13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F0C4EDB-F07F-4667-BD08-6C278CC7FA13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F0C4EDB-F07F-4667-BD08-6C278CC7FA13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C43EE3-77DC-4B13-AE19-9CF0EC402562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C43EE3-77DC-4B13-AE19-9CF0EC402562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C43EE3-77DC-4B13-AE19-9CF0EC402562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C43EE3-77DC-4B13-AE19-9CF0EC402562}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
