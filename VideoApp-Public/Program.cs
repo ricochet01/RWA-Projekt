@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using VideosApp.Data;
 using VideosApp.Interface;
 using VideosApp.Repository;
@@ -13,12 +15,18 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IVideoRepository, VideoRepository>();
+
+builder.Services
+	.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+	.AddCookie();
 
 var app = builder.Build();
 
