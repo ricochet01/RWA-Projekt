@@ -58,7 +58,7 @@
         <dd asp-for="VideoTags" class="col-sm-10">
 	        @foreach (var videoTag in Model.VideoTags)
 	        {
-                @Html.DisplayText(videoTag.Tag.Name + ", ");
+                <span>@videoTag.Tag.Name </span>
 	        }
         </dd>
     </dl>

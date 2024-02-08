@@ -26,6 +26,12 @@ namespace VideosApp.Repository
         public bool UserExists(int id)
             => dataContext.Users.Any(u => u.Id == id && u.DeletedAt == null);
 
+        public bool UserExists(string username)
+            => dataContext.Users.Any(u => u.Username == username);
+
+        public bool UserExists(string username, string password)
+            => dataContext.Users.Any(u => u.Username == username && u.PwdHash == password);
+
         public bool CreateUser(int countryId, User user)
         {
             var country = dataContext.Countries.FirstOrDefault(c => c.Id == countryId);
