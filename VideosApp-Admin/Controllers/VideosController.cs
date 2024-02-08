@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VideosApp.Data;
+using VideosApp.Dto;
 using VideosApp.Interface;
 using VideosApp.Model;
 using VideosApp_Admin.Paging;
@@ -15,11 +16,14 @@ namespace VideosApp_Admin.Controllers
     public class VideosController : Controller
     {
 	    private readonly IVideoRepository videoRepository;
+        private readonly ITagRepository tagRepository;
         private readonly DataContext _context;
 
-        public VideosController(IVideoRepository videoRepository, DataContext context)
+        public VideosController(
+            IVideoRepository videoRepository, ITagRepository tagRepository, DataContext context)
         {
             this.videoRepository = videoRepository;
+            this.tagRepository = tagRepository;
             _context = context;
         }
 
@@ -71,21 +75,36 @@ namespace VideosApp_Admin.Controllers
         }
 
         // GET: Videos/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
-            if (id == null || _context.Videos == null)
+            if (id == null || videoRepository == null)
             {
                 return NotFound();
             }
 
-            var video = await _context.Videos
+            var video = videoRepository.GetAsyncVideos()
                 .Include(v => v.Genre)
                 .Include(v => v.Image)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefault(m => m.Id == id);
+
             if (video == null)
             {
                 return NotFound();
             }
+
+            var tags = videoRepository.GetVideoTags(video.Id);
+            var videoTags = new List<VideoTag>();
+
+            foreach (var tag in tags)
+            {
+                videoTags.Add(new VideoTag()
+                {
+                    Tag = tag,
+                    Video = video
+                });
+            }
+
+            video.VideoTags = videoTags;
 
             return View(video);
         }
@@ -103,14 +122,29 @@ namespace VideosApp_Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id,CreatedAt,Name,Description,GenreId,TotalSeconds,StreamingUrl,ImageId")] Video video)
+        public IActionResult Create(
+	        [Bind("Id,CreatedAt,Name,Description,GenreId,TotalSeconds,StreamingUrl,ImageId,VideoTags")] Video video,
+	        IFormCollection form)
         {
+            ModelState.Remove("Genre");
+
             if (ModelState.IsValid)
             {
-	            // videoRepository.CreateVideo(video);
+                string tagText = form["VideoTags"].ToString();
+                string[] splitTags = tagText.Split(',');
+
+                foreach (var tag in splitTags)
+                {
+                    tagRepository.CreateTag(new() { Name = tag });
+                }
+
+                var dbTags = tagRepository.GetTags().Where(t => splitTags.Contains(t.Name)).ToArray();
+                var tagIds = dbTags.Select(t => t.Id).ToArray();
+
+	            videoRepository.CreateVideo(video.GenreId, (int) video.ImageId, tagIds, video);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GenreId"] = new SelectList(_context.Genres, "Id", "Name", video.GenreId);
+            ViewData["GenreId"] = new SelectList(_context.Genres, "Id", "Id", video.GenreId);
             ViewData["ImageId"] = new SelectList(_context.Images, "Id", "Id", video.ImageId);
             return View(video);
         }
@@ -123,11 +157,16 @@ namespace VideosApp_Admin.Controllers
                 return NotFound();
             }
 
-            var video = videoRepository.GetVideo((int)id);
+            var video = videoRepository.GetAsyncVideos()
+                .Include(v => v.Genre)
+                .Include(v => v.Image)
+                .FirstOrDefault(m => m.Id == id);
+
             if (video == null)
             {
                 return NotFound();
             }
+
             ViewData["GenreId"] = new SelectList(_context.Genres, "Id", "Name", video.GenreId);
             ViewData["ImageId"] = new SelectList(_context.Images, "Id", "Id", video.ImageId);
             return View(video);
@@ -138,7 +177,8 @@ namespace VideosApp_Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CreatedAt,Name,Description,GenreId,TotalSeconds,StreamingUrl,ImageId")] Video video)
+        public async Task<IActionResult> Edit(
+            int id, [Bind("Id,CreatedAt,Name,Description,GenreId,TotalSeconds,StreamingUrl,ImageId")] Video video)
         {
             if (id != video.Id)
             {

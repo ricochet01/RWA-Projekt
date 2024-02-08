@@ -50,7 +50,16 @@
             @Html.DisplayNameFor(model => model.Image)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image.Id)
+	        @Html.DisplayFor(model => model.Image.Id)
+        </dd>
+        <dt class = "col-sm-2">
+	        @Html.DisplayNameFor(model => model.VideoTags)
+        </dt>
+        <dd asp-for="VideoTags" class="col-sm-10">
+	        @foreach (var videoTag in Model.VideoTags)
+	        {
+                @Html.DisplayText(videoTag.Tag.Name + ", ");
+	        }
         </dd>
     </dl>
 </div>

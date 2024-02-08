@@ -18,7 +18,7 @@ namespace VideosApp.Repository
             => context.Videos.OrderBy(v => v.Id).ToList();
 
         public IQueryable<Video> GetAsyncVideos()
-	        => context.Videos.AsNoTracking();
+	        => context.Videos.OrderBy(v => v.Id).AsNoTracking();
 
         public Video GetVideo(int id)
             => context.Videos.FirstOrDefault(v => v.Id == id);
