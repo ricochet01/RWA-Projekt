@@ -31,7 +31,7 @@ namespace VideoApp_Public.Controllers
             return View();
         }
 
-        // POST: Users/Create
+        // POST: Register
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(
@@ -53,10 +53,10 @@ namespace VideoApp_Public.Controllers
                 user.CreatedAt = DateTime.Now;
 
                 userRepository.CreateUser(user.CountryOfResidenceId, user);
-                return RedirectToAction(nameof(Index));
+                return Redirect("/");
             }
 
-			return Redirect("/");
-        }
+			return RedirectToAction(nameof(Index));
+		}
     }
 }

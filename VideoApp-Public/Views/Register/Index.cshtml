@@ -13,27 +13,27 @@
 				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 				<div class="form-group">
 					<label asp-for="Username" class="control-label">Username</label>
-					<input asp-for="Username" id="usernameInput" class="form-control" />
+					<input asp-for="Username" id="usernameInput" class="form-control" required="true" />
 					<span asp-validation-for="Username" class="text-danger"></span>
 				</div>
 				<div class="form-group">
 					<label asp-for="FirstName" class="control-label">First name</label>
-					<input asp-for="FirstName" id="firstNameInput" class="form-control" />
+					<input asp-for="FirstName" id="firstNameInput" class="form-control" required="true" />
 					<span asp-validation-for="FirstName" class="text-danger"></span>
 				</div>
 				<div class="form-group">
 					<label asp-for="LastName" class="control-label">Last name</label>
-					<input asp-for="LastName" id="lastNameInput" class="form-control" />
+					<input asp-for="LastName" id="lastNameInput" class="form-control" required="true" />
 					<span asp-validation-for="LastName" class="text-danger"></span>
 				</div>
 				<div class="form-group">
 					<label asp-for="Email" class="control-label">Email</label>
-					<input asp-for="Email" id="emailInput" class="form-control" />
+					<input asp-for="Email" id="emailInput" class="form-control" required="true" />
 					<span asp-validation-for="Email" class="text-danger"></span>
 				</div>
 				<div class="form-group">
 					<label asp-for="PwdHash" class="control-label">Password</label>
-					<input asp-for="PwdHash" type="password" id="passwordInput" class="form-control" />
+					<input asp-for="PwdHash" type="password" id="passwordInput" class="form-control" required="true" />
 					<span asp-validation-for="PwdHash" class="text-danger"></span>
 				</div>
 				<div class="form-group">
@@ -45,10 +45,11 @@
 					<select asp-for="CountryOfResidenceId" class="form-control" asp-items="ViewBag.CountryOfResidenceId"></select>
 				</div>
 				<div class="form-group">
-					<input type="submit" value="Register" class="btn btn-primary m-5" />
+					<input type="submit" id="btn-submit" value="Register" class="btn btn-primary m-5" />
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
+
 

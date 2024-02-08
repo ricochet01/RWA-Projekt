@@ -4,32 +4,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
+using VideoApp_Public.Models;
+using VideoApp_Public.Utils;
 using VideosApp.Data;
+using VideosApp.Interface;
 using VideosApp.Model;
 
 namespace VideoApp_Public.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IUserRepository userRepository;
 
-        public LoginController(DataContext context)
+        public LoginController(IUserRepository userRepository)
         {
-            _context = context;
+            this.userRepository = userRepository;
         }
 
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            //var dataContext = _context.Users.Include(u => u.CountryOfResidence);
-            return View();
-        }
-
-        // GET: Users/Create
-        public IActionResult Create()
-        {
-            ViewData["CountryOfResidenceId"] = new SelectList(_context.Countries, "Id", "Code");
             return View();
         }
 
@@ -38,16 +34,28 @@ namespace VideoApp_Public.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CreatedAt,DeletedAt,Username,FirstName,LastName,Email,PwdHash,PwdSalt,Phone,IsConfirmed,SecurityToken,CountryOfResidenceId")] User user)
+        public IActionResult Create(LoginModel login)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+	            return RedirectToAction(nameof(Index));
             }
-            ViewData["CountryOfResidenceId"] = new SelectList(_context.Countries, "Id", "Code", user.CountryOfResidenceId);
-            return View(user);
-        }
+
+            var username = login.Username;
+            var password = login.Password;
+
+            if (userRepository.UserExists(username))
+            {
+	            var user = userRepository.GetUser(username);
+
+	            string pwdHash = LoginUtils.CreateHash(password, Convert.FromBase64String(user.PwdSalt));
+	            if (userRepository.UserExists(username, pwdHash))
+	            {
+		            return Redirect("/");
+	            }
+            }
+
+			return RedirectToAction(nameof(Index));
+		}
     }
 }
