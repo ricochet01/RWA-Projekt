@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿using System.Collections.Immutable;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using VideosApp.Dto;
+using VideosApp.Helper;
 using VideosApp.Interface;
 using VideosApp.Model;
 using VideosApp.Repository;
@@ -23,13 +25,46 @@ namespace VideosApp.Controllers
         // GET: api/Video
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Video>))]
-        public ActionResult<IEnumerable<Video>> GetVideos()
+        public ActionResult<IEnumerable<Video>> GetVideos(
+	        string? sortOrder, string? searchString, int? pageNumber, int pageSize)
         {
-            var videos = mapper.Map<List<VideoDto>>(videoRepository.GetVideos());
+			var videos = mapper.Map<List<VideoDto>>(videoRepository.GetVideos());
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            return Ok(videos);
+            // Filter by the search value; if the search string is empty, do not filter anything
+            if (!string.IsNullOrEmpty(searchString))
+            {
+	            videos = videos.Where(v => v.Name.ToLower().Contains(searchString.ToLower())).ToList();
+			}
+
+            // Default ordering is by id ascending
+            switch (sortOrder)
+            {
+                case "id_desc":
+	                videos = videos.OrderByDescending(v => v.Id).ToList();
+					break;
+	            case "name":
+		            videos = videos.OrderBy(v => v.Name).ToList();
+		            break;
+				case "name_desc":
+		            videos = videos.OrderByDescending(v => v.Name).ToList();
+		            break;
+	            case "total_time":
+		            videos = videos.OrderBy(v => v.TotalSeconds).ToList();
+		            break;
+	            case "total_time_desc":
+		            videos = videos.OrderByDescending(v => v.TotalSeconds).ToList();
+		            break;
+            }
+
+            int pageNum = (pageNumber ?? 1);
+            if (pageNum <= 0) pageNum = 1;
+            
+            // Paging
+            videos = videos.Skip((pageNum - 1) * pageSize).Take(pageSize).ToList();
+
+			return Ok(videos);
         }
 
         [HttpGet("{id}")]

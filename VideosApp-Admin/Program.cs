@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using VideosApp.Data;
+using VideosApp.Interface;
+using VideosApp.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,13 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IVideoRepository, VideoRepository>();
 
 var app = builder.Build();
 

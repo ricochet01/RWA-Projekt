@@ -1,5 +1,4 @@
 ﻿@model VideosApp_Admin.Paging.PaginatedList<VideosApp.Model.Country>
-@using PagedList.Mvc;
 
 @{
     ViewData["Title"] = "All countries";
@@ -11,10 +10,10 @@
 	<thead>
 	<tr>
 		<th>
-			Code @* @Html.ActionLink("Code") *@
+			@Html.DisplayNameFor(model => model.FirstOrDefault().Code)
 		</th>
 		<th>
-			Name @* @Html.DisplayNameFor(model => model.Name) --> *@
+			@Html.DisplayNameFor(model => model.FirstOrDefault().Name)
 		</th>
 		<th></th>
 	</tr>

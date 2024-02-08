@@ -1,4 +1,5 @@
-﻿using VideosApp.Data;
+﻿using System.Data.Entity;
+using VideosApp.Data;
 using VideosApp.Interface;
 using VideosApp.Model;
 
@@ -13,8 +14,11 @@ namespace VideosApp.Repository
             this.context = context;
         }
 
-        public ICollection<Video> GetVideos()
+        public IEnumerable<Video> GetVideos()
             => context.Videos.OrderBy(v => v.Id).ToList();
+
+        public IQueryable<Video> GetAsyncVideos()
+	        => context.Videos.AsNoTracking();
 
         public Video GetVideo(int id)
             => context.Videos.FirstOrDefault(v => v.Id == id);
@@ -28,7 +32,7 @@ namespace VideosApp.Repository
         public ICollection<Tag> GetVideoTags(int id)
             => context.VideoTags.Where(vt => vt.VideoId == id).Select(vt => vt.Tag).ToList();
 
-        public bool CreateVideo(int genreId, int imageId, int[] tagIds, Video video)
+		public bool CreateVideo(int genreId, int imageId, int[] tagIds, Video video)
         {
             var imageEntity = context.Images.FirstOrDefault(i => i.Id == imageId);
             var genreEntity = context.Genres.FirstOrDefault(g => g.Id == genreId);
