@@ -10,6 +10,7 @@ using VideosApp.Dto;
 using VideosApp.Interface;
 using VideosApp.Model;
 using VideosApp_Admin.Paging;
+using VideosApp_Admin.Utils;
 
 namespace VideosApp_Admin.Controllers
 {
@@ -124,9 +125,10 @@ namespace VideosApp_Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(
 	        [Bind("Id,CreatedAt,Name,Description,GenreId,TotalSeconds,StreamingUrl,ImageId,VideoTags")] Video video,
-	        IFormCollection form)
+	        IFormCollection form, [FromForm(Name = "videoImage")] IFormFile file)
         {
             ModelState.Remove("Genre");
+            ModelState.Remove("videoImage");
 
             if (ModelState.IsValid)
             {
@@ -138,12 +140,36 @@ namespace VideosApp_Admin.Controllers
                     tagRepository.CreateTag(new() { Name = tag });
                 }
 
+                byte[] data = null;
+
+                if (file != null)
+                {
+                    if (file.ContentType == "image/jpg" || file.ContentType == "image/jpeg")
+                    {
+                        data = ImageUtils.FileToByteArray(file);
+                        var img = new Image()
+                        {
+                            Content = data
+                        };
+
+                        _context.Add(img);
+                        _context.SaveChanges();
+                    }
+                }
+
                 var dbTags = tagRepository.GetTags().Where(t => splitTags.Contains(t.Name)).ToArray();
                 var tagIds = dbTags.Select(t => t.Id).ToArray();
 
-	            videoRepository.CreateVideo(video.GenreId, (int) video.ImageId, tagIds, video);
+                var imgId = 0;
+                if (data != null)
+                {
+                    imgId = _context.Images.FirstOrDefault(i => Enumerable.SequenceEqual(i.Content, data)).Id;
+                }
+
+	            videoRepository.CreateVideo(video.GenreId, imgId, tagIds, video);
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["GenreId"] = new SelectList(_context.Genres, "Id", "Id", video.GenreId);
             ViewData["ImageId"] = new SelectList(_context.Images, "Id", "Id", video.ImageId);
             return View(video);
@@ -177,7 +203,7 @@ namespace VideosApp_Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
+        public IActionResult Edit(
             int id, [Bind("Id,CreatedAt,Name,Description,GenreId,TotalSeconds,StreamingUrl,ImageId")] Video video)
         {
             if (id != video.Id)
@@ -185,12 +211,16 @@ namespace VideosApp_Admin.Controllers
                 return NotFound();
             }
 
+            ModelState.Remove("Genre");
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(video);
-                    await _context.SaveChangesAsync();
+                    var dbTags = videoRepository.GetVideoTags(video.Id);
+                    var tagIds = dbTags.Select(t => t.Id).ToArray();
+
+                    videoRepository.UpdateVideo(video.GenreId, (int)video.ImageId, tagIds, video);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
