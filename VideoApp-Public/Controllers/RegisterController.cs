@@ -43,6 +43,18 @@ namespace VideoApp_Public.Controllers
             // And we're storing the ID of the country rather than the country object
 	        ModelState.Remove("CountryOfResidence");
 
+            var existingUser = userRepository
+                .GetUsers()
+                .FirstOrDefault(
+                    u => u.Username.Trim().ToUpper() == user.Username.Trim().ToUpper()
+                         || u.Email.Trim().ToUpper() == user.Email.Trim().ToUpper());
+
+            if (existingUser != null)
+            {
+                // The user with the existing username/email already exists
+                return RedirectToAction(nameof(Index));
+            }
+
             if (ModelState.IsValid)
             {
 	            var salt = LoginUtils.GenerateSalt();

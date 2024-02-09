@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper.Execution;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using VideosApp.Data;
 using VideosApp.Model;
 using PagedList;
+using VideosApp.Interface;
 using VideosApp_Admin.Paging;
 
 namespace VideosApp_Admin.Controllers
@@ -15,10 +19,12 @@ namespace VideosApp_Admin.Controllers
     public class CountriesController : Controller
     {
         private readonly DataContext _context;
+        private readonly ICountryRepository countryRepository;
 
-        public CountriesController(DataContext context)
+        public CountriesController(DataContext context, ICountryRepository countryRepository)
         {
             _context = context;
+            this.countryRepository = countryRepository;
         }
 
         // GET: Countries
@@ -58,10 +64,31 @@ namespace VideosApp_Admin.Controllers
             return View();
         }
 
-        // POST: Countries/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        public ActionResult GetWithAjax(int id)
+        {
+	        var countries = countryRepository.GetCountries();
+
+	        var toSend = new List<object>();
+
+	        foreach (var c in countries)
+	        {
+		        var data = new
+		        {
+                    Code = c.Code,
+                    Name = c.Name
+		        };
+                toSend.Add(data);
+	        }
+
+	        var arr = toSend.ToArray();
+
+            return Json(arr);
+        }
+
+		// POST: Countries/Create
+		// To protect from overposting attacks, enable the specific properties you want to bind to.
+		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+		[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Code,Name")] Country country)
         {
