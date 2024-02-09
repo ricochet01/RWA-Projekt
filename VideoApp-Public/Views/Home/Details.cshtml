@@ -1,0 +1,80 @@
+﻿@model VideosApp.Model.Video
+
+@{
+	ViewData["Title"] = "Video details";
+}
+
+<div>
+    <h4>Video</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedAt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedAt)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TotalSeconds)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TotalSeconds)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StreamingUrl)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StreamingUrl)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Genre)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Genre.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Image)
+        </dt>
+        <dd class="col-sm-10">
+	        @{
+		        if (Model.Image != null)
+		        {
+			        var base64 = Convert.ToBase64String(Model.Image.Content);
+			        var imgSrc = String.Format("data:image/jpg;base64,{0}", base64);
+
+			        <img src="@imgSrc" class="img-fluid" style="  max-width: 250px;width:100%;" />
+		        }
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VideoTags)
+        </dt>
+        <dd asp-for="VideoTags" class="col-sm-10">
+	        @foreach (var videoTag in Model.VideoTags)
+	        {
+		        <span>@videoTag.Tag.Name </span>
+	        }
+        </dd>
+        <dt>
+	        @{
+		        var url = Model.StreamingUrl;
+	            <a href="http://@url" target="_blank">Watch video</a>
+            }
+        </dt>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

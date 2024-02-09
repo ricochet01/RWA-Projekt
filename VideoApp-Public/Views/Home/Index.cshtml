@@ -1,8 +1,53 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http;
+@using System.Security.Claims
+@inject IHttpContextAccessor httpContextAccessor
+@model IEnumerable<VideosApp.Model.Video>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@{
+	string username = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+	if (!string.IsNullOrEmpty(username))
+	{
+		<form asp-action="Index" method="get">
+			<div class="form-actions no-color">
+				<p>
+					Search video by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+					<input type="submit" value="Search" class="btn btn-primary" />
+				</p>
+			</div>
+		</form>
+
+		<div class="justify-content-center container">
+			@for (int i = 0; i < Model.Count(); i++)
+			{
+				var video = Model.ElementAt(i);
+
+				<div class="row">
+					<div class="col-12 border">
+						<h3>@video.Name</h3>
+						<p>@video.Description</p>
+						@*<a href="@video.StreamingUrl">Watch video here!</a>*@
+
+						@{
+							var base64 = Convert.ToBase64String(video.Image.Content);
+							var imgSrc = String.Format("data:image/jpg;base64,{0}", base64);
+						}
+
+						<img src="@imgSrc" class="img-fluid" style="  max-width: 250px;width:100%;"/>
+						<a asp-action="Details" asp-route-id="@video?.Id">View details</a>
+					</div>
+				</div>
+			}
+		</div>
+
+	}
+	else
+	{
+		<h2>Log in to view page content</h2>
+	}
+}
+
+	
